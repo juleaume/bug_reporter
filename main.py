@@ -129,6 +129,15 @@ class Window(QMainWindow):
         self.layout.addWidget(generate_box)
 
     def set_priority(self):
+        """
+        Sets the priority given the severity and probability
+        if both low => None
+        if med/low => Low
+        if low/high or both med => med
+        if med/high => high
+        if both high => urgent
+        :return: None
+        """
         sever = self.impact[SEVERITY_STR].currentText()
         repro = self.impact[REPRODUCIBILITY_STR].currentText()
         if sever == repro == IMPACT_LOW_STR:
@@ -147,11 +156,19 @@ class Window(QMainWindow):
             self.priority.setCurrentText(PRIORITY_URGENT_STR)
 
     def browse_file(self):
+        """
+        opens a dialog file and set the attachment line entry with the text
+        :return: None
+        """
         path = QFileDialog(self, "Add file", "~", "*")
         if path.exec_() == QDialog.Accepted:
             self.attachment.setText(path.selectedFiles()[0])
 
     def save_report(self):
+        """
+        Saves the report as a file
+        :return: None
+        """
         path = QFileDialog(self, "Save Report", "", "*.log")
         if path.exec_() == QDialog.Accepted:
             with open(path.selectedFiles()[0], "w") as report:
@@ -174,6 +191,10 @@ class Window(QMainWindow):
             validation_box.exec_()
 
     def enter_address(self):
+        """
+        opens a dialog to enter the dev's address
+        :return:
+        """
         address_dialog = QDialog(self)
         address_dialog.setWindowTitle("Email to...")
         form_layout = QFormLayout()
@@ -189,6 +210,11 @@ class Window(QMainWindow):
         address_dialog.exec_()
 
     def send_email(self, address):
+        """
+        opens a web browser and automatically writes an email to the address
+        :param address: the address to send the mail to
+        :return: None
+        """
         subject = f"Bug report - V. {self.version.text()}".replace(" ", "%20")
         body = f"Bug report\n\n" \
                f"Version: {self.version.text()}\n" \
