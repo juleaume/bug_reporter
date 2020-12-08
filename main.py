@@ -5,8 +5,8 @@ from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, Q
     QHBoxLayout, QComboBox, QPushButton, QFileDialog, QDialog, QMessageBox, QFormLayout
 
 VERSION_MAJOR = 0
-VERSION_MINOR = 1
-VERSION_BUILD = 1
+VERSION_MINOR = 2
+VERSION_BUILD = 0
 
 VERSION = f"{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_BUILD}"
 
