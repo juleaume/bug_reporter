@@ -5,7 +5,7 @@ from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, Q
     QHBoxLayout, QComboBox, QPushButton, QFileDialog, QDialog, QMessageBox, QFormLayout
 
 VERSION_MAJOR = 0
-VERSION_MINOR = 0
+VERSION_MINOR = 1
 VERSION_BUILD = 0
 
 VERSION = f"{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_BUILD}"
@@ -76,6 +76,13 @@ class Window(QMainWindow):
         proto_layout.addWidget(self.protocol)
         proto_box.setLayout(proto_layout)
         self.layout.addWidget(proto_box)
+
+        stack_box = QGroupBox("Stacktrace (if any)")
+        stack_layout = QVBoxLayout()
+        self.stacktrace = QPlainTextEdit()
+        stack_layout.addWidget(self.stacktrace)
+        stack_box.setLayout(stack_layout)
+        self.layout.addWidget(stack_box)
 
         impact_box = QGroupBox("Impact")
         impact_layout = QHBoxLayout()
@@ -154,9 +161,11 @@ class Window(QMainWindow):
                 report.write(f"3. What's going on?:\n{self.description.toPlainText()}\n")
                 report.write(f"4.a Results Expected:\n{self.results[EXPECTED_STR].toPlainText()}\n")
                 report.write(f"4.b Results Obtained:\n{self.results[OBTAINED_STR].toPlainText()}\n")
-                report.write(f"5. Impact:\n\tSeverity: {self.impact[SEVERITY_STR].currentText()}"
+                report.write(f"5. Protocol:\n{self.protocol.toPlainText()}\n")
+                report.write(f"6. Stacktrace:\n{self.stacktrace.toPlainText()}\n")
+                report.write(f"7. Impact:\n\tSeverity: {self.impact[SEVERITY_STR].currentText()}"
                              f"\n\tReproducibility: {self.impact[REPRODUCIBILITY_STR].currentText()}\n")
-                report.write(f"6. Priority: {self.priority.currentText()}\n")
+                report.write(f"8. Priority: {self.priority.currentText()}\n")
             validation_box = QMessageBox()
             validation_box.setWindowTitle("Success")
             validation_box.setText(f"Save successful at {path.selectedFiles()[0]}\nDon't forget the attachment.")
@@ -187,6 +196,8 @@ class Window(QMainWindow):
                f"What's going on:\n{self.description.toPlainText()}\n" \
                f"Results Expected:\n{self.results[EXPECTED_STR].toPlainText()}\n" \
                f"Results Obtained:\n{self.results[OBTAINED_STR].toPlainText()}\n" \
+               f"Protocol:\n{self.protocol.toPlainText()}\n" \
+               f"Stacktrace:\n{self.stacktrace.toPlainText()}" \
                f"Impact:\nSeverity: {self.impact[SEVERITY_STR].currentText()}\n" \
                f"Reproducibility: {self.impact[REPRODUCIBILITY_STR].currentText()}\n" \
                f"Priority: {self.priority.currentText()}\n" \
