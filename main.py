@@ -43,6 +43,8 @@ class Window(QMainWindow):
         version_layout.addWidget(self.version)
         self.layout.addWidget(version_box)
 
+        # TODO add tiptoolhelp on several elements
+
         env_box = QGroupBox("Environment")
         env_layout = QVBoxLayout()
         env_box.setLayout(env_layout)
@@ -155,6 +157,39 @@ class Window(QMainWindow):
         elif repro == sever == IMPACT_HIGH_STR:
             self.priority.setCurrentText(PRIORITY_URGENT_STR)
 
+    def can_generate_report(self) -> bool:
+        """
+        check if a report can be generated
+        :return: True if a report can be generated, False else
+        """
+        can_generate = True
+        list_of_lines = [self.version, self.environment]
+        for line in list_of_lines:
+            can_generate &= not line.text() == ""
+        list_of_plains = [self.description, self.results[EXPECTED_STR], self.results[OBTAINED_STR], self.protocol]
+        for plain in list_of_plains:
+            can_generate &= not plain.toPlainText() == ""
+        return can_generate
+
+    def show_missing(self):
+        missing_text = ""
+        list_of_lines = [self.version, self.environment]
+        lists_line_names = ["Version number", "Environment"]
+        for line, name in zip(list_of_lines, lists_line_names):
+            if line.text() == "":
+                missing_text += f"\t- {name}\n"
+        list_of_plains = [self.description, self.results[EXPECTED_STR], self.results[OBTAINED_STR], self.protocol]
+        lists_plain_names = ["Description", "Expected results", "Obtained results", "Protocol"]
+        for plain, name in zip(list_of_plains, lists_plain_names):
+            if plain.toPlainText() == "":
+                missing_text += f"\t- {name}\n"
+        error_box = QMessageBox(self)
+        error_box.setWindowTitle("Error")
+        error_box.setText(f"Cannot generate report, missing following fields:\n{missing_text}")
+        error_box.setIcon(QMessageBox.Warning)
+        error_box.setStandardButtons(QMessageBox.Ok)
+        error_box.exec_()
+
     def browse_file(self):
         """
         opens a dialog file and set the attachment line entry with the text
@@ -169,45 +204,51 @@ class Window(QMainWindow):
         Saves the report as a file
         :return: None
         """
-        path = QFileDialog(self, "Save Report", "", "*.log")
-        if path.exec_() == QDialog.Accepted:
-            with open(path.selectedFiles()[0], "w") as report:
-                report.write("Bug report\n\n")
-                report.write(f"1. Version: {self.version.text()}\n")
-                report.write(f"2. Environment: {self.environment.text()}\n")
-                report.write(f"3. What's going on?:\n{self.description.toPlainText()}\n")
-                report.write(f"4.a Results Expected:\n{self.results[EXPECTED_STR].toPlainText()}\n")
-                report.write(f"4.b Results Obtained:\n{self.results[OBTAINED_STR].toPlainText()}\n")
-                report.write(f"5. Protocol:\n{self.protocol.toPlainText()}\n")
-                report.write(f"6. Stacktrace:\n{self.stacktrace.toPlainText()}\n")
-                report.write(f"7. Impact:\n\tSeverity: {self.impact[SEVERITY_STR].currentText()}"
-                             f"\n\tReproducibility: {self.impact[REPRODUCIBILITY_STR].currentText()}\n")
-                report.write(f"8. Priority: {self.priority.currentText()}\n")
-            validation_box = QMessageBox()
-            validation_box.setWindowTitle("Success")
-            validation_box.setText(f"Save successful at {path.selectedFiles()[0]}\nDon't forget the attachment.")
-            validation_box.setIcon(QMessageBox.Information)
-            validation_box.setStandardButtons(QMessageBox.Ok)
-            validation_box.exec_()
+        if self.can_generate_report():
+            path = QFileDialog(self, "Save Report", "", "*.log")
+            if path.exec_() == QDialog.Accepted:
+                with open(path.selectedFiles()[0], "w") as report:
+                    report.write("Bug report\n\n")
+                    report.write(f"1. Version: {self.version.text()}\n")
+                    report.write(f"2. Environment: {self.environment.text()}\n")
+                    report.write(f"3. What's going on?:\n{self.description.toPlainText()}\n")
+                    report.write(f"4.a Results Expected:\n{self.results[EXPECTED_STR].toPlainText()}\n")
+                    report.write(f"4.b Results Obtained:\n{self.results[OBTAINED_STR].toPlainText()}\n")
+                    report.write(f"5. Protocol:\n{self.protocol.toPlainText()}\n")
+                    report.write(f"6. Stacktrace:\n{self.stacktrace.toPlainText()}\n")
+                    report.write(f"7. Impact:\n\tSeverity: {self.impact[SEVERITY_STR].currentText()}"
+                                 f"\n\tReproducibility: {self.impact[REPRODUCIBILITY_STR].currentText()}\n")
+                    report.write(f"8. Priority: {self.priority.currentText()}\n")
+                validation_box = QMessageBox()
+                validation_box.setWindowTitle("Success")
+                validation_box.setText(f"Save successful at {path.selectedFiles()[0]}\nDon't forget the attachment.")
+                validation_box.setIcon(QMessageBox.Information)
+                validation_box.setStandardButtons(QMessageBox.Ok)
+                validation_box.exec_()
+        else:
+            self.show_missing()
 
     def enter_address(self):
         """
         opens a dialog to enter the dev's address
         :return:
         """
-        address_dialog = QDialog(self)
-        address_dialog.setWindowTitle("Email to...")
-        form_layout = QFormLayout()
-        email_line_edit = QLineEdit("guillaume.gautier@altran.com")
-        form_layout.addRow("Email:", email_line_edit)
-        accept_button = QPushButton("Send")
-        accept_button.clicked.connect(lambda: self.send_email(email_line_edit.text()))
-        accept_button.clicked.connect(address_dialog.close)
-        cancel_button = QPushButton("Cancel")
-        cancel_button.clicked.connect(address_dialog.close)
-        form_layout.addRow(accept_button, cancel_button)
-        address_dialog.setLayout(form_layout)
-        address_dialog.exec_()
+        if self.can_generate_report():
+            address_dialog = QDialog(self)
+            address_dialog.setWindowTitle("Email to...")
+            form_layout = QFormLayout()
+            email_line_edit = QLineEdit("guillaume.gautier@altran.com")
+            form_layout.addRow("Email:", email_line_edit)
+            accept_button = QPushButton("Send")
+            accept_button.clicked.connect(lambda: self.send_email(email_line_edit.text()))
+            accept_button.clicked.connect(address_dialog.close)
+            cancel_button = QPushButton("Cancel")
+            cancel_button.clicked.connect(address_dialog.close)
+            form_layout.addRow(accept_button, cancel_button)
+            address_dialog.setLayout(form_layout)
+            address_dialog.exec_()
+        else:
+            self.show_missing()
 
     def send_email(self, address):
         """
