@@ -6,7 +6,7 @@ from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, Q
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 2
-VERSION_BUILD = 0
+VERSION_BUILD = 1
 
 VERSION = f"{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_BUILD}"
 
@@ -238,22 +238,26 @@ class Window(QMainWindow):
             address_dialog.setWindowTitle("Email to...")
             form_layout = QFormLayout()
             email_line_edit = QLineEdit("guillaume.gautier@altran.com")
+            cc_line_edit = QLineEdit()
             form_layout.addRow("Email:", email_line_edit)
+            form_layout.addRow("CC:", cc_line_edit)
             accept_button = QPushButton("Send")
-            accept_button.clicked.connect(lambda: self.send_email(email_line_edit.text()))
+            accept_button.clicked.connect(lambda: self.send_email(email_line_edit.text(), cc_line_edit.text()))
             accept_button.clicked.connect(address_dialog.close)
             cancel_button = QPushButton("Cancel")
             cancel_button.clicked.connect(address_dialog.close)
             form_layout.addRow(accept_button, cancel_button)
             address_dialog.setLayout(form_layout)
+            address_dialog.setFixedWidth(500)
             address_dialog.exec_()
         else:
             self.show_missing()
 
-    def send_email(self, address):
+    def send_email(self, address, cc):
         """
         opens a web browser and automatically writes an email to the address
         :param address: the address to send the mail to
+        :param cc: the copy-carbon to send to
         :return: None
         """
         subject = f"Bug report - V. {self.version.text()}".replace(" ", "%20")
@@ -269,8 +273,11 @@ class Window(QMainWindow):
                f"Reproducibility: {self.impact[REPRODUCIBILITY_STR].currentText()}\n" \
                f"Priority: {self.priority.currentText()}\n" \
                f"Additional files: attached".replace('\n', '%0d%0a').replace('?', '..')
-        print(body)
-        webbrowser.open(f"mailto:{address}&subject={subject}&body={body}")
+        if not cc == "":
+            cc_address = f"&cc={cc}"
+        else:
+            cc_address = ""
+        webbrowser.open(f"mailto:{address}{cc_address}&subject={subject}&body={body}")
 
 
 if __name__ == '__main__':
