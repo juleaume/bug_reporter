@@ -1,12 +1,14 @@
 import sys
 import webbrowser
 
+from PySide2.QtCore import Qt
+from PySide2.QtGui import QMouseEvent
 from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QGroupBox, QLineEdit, QPlainTextEdit, \
-    QHBoxLayout, QComboBox, QPushButton, QFileDialog, QDialog, QMessageBox, QFormLayout
+    QHBoxLayout, QComboBox, QPushButton, QFileDialog, QDialog, QMessageBox, QFormLayout, QMenu
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 2
-VERSION_BUILD = 1
+VERSION_BUILD = 2
 
 VERSION = f"{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_BUILD}"
 
@@ -32,6 +34,7 @@ class Window(QMainWindow):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
         self.setWindowTitle(f"Bug report - v. {VERSION}")
+        self.dark_mode = False
         self.central_widget = QWidget()
         self.layout = QVBoxLayout()
         self.central_widget.setLayout(self.layout)
@@ -278,6 +281,25 @@ class Window(QMainWindow):
         else:
             cc_address = ""
         webbrowser.open(f"mailto:{address}{cc_address}&subject={subject}&body={body}")
+
+    def _create_menu(self, event: QMouseEvent):
+        context_menu = QMenu(self)
+        context_menu.addAction("Toggle dark mode", self.set_dark_mode)
+        context_menu.addAction("Generate report", self.save_report)
+        context_menu.addAction("Send email to...", self.enter_address)
+        context_menu.addAction("Quit Report", self.close)
+        context_menu.exec_(self.mapToGlobal(event.pos()))
+
+    def set_dark_mode(self):
+        self.dark_mode = not self.dark_mode
+        if self.dark_mode:
+            self.setStyleSheet("background-color: #002b36; color: #b58900")
+        else:
+            self.setStyleSheet("")
+
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+        if event.button() == Qt.RightButton:
+            self._create_menu(event)
 
 
 if __name__ == '__main__':
