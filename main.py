@@ -8,7 +8,7 @@ from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, Q
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 2
-VERSION_BUILD = 2
+VERSION_BUILD = 3
 
 VERSION = f"{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_BUILD}"
 
@@ -77,7 +77,7 @@ class Window(QMainWindow):
 
         proto_box = QGroupBox("Protocol")
         proto_layout = QVBoxLayout()
-        self.protocol = QPlainTextEdit()
+        self.protocol = QPlainTextEdit("1.")
         proto_layout.addWidget(self.protocol)
         proto_box.setLayout(proto_layout)
         self.layout.addWidget(proto_box)
@@ -300,6 +300,7 @@ class Window(QMainWindow):
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.RightButton:
             self._create_menu(event)
+            event.accept()
 
 
 if __name__ == '__main__':
