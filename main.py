@@ -6,9 +6,14 @@ from PySide2.QtGui import QMouseEvent
 from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QGroupBox, QLineEdit, QPlainTextEdit, \
     QHBoxLayout, QComboBox, QPushButton, QFileDialog, QDialog, QMessageBox, QFormLayout, QMenu
 
+python_requirements = (3, 6)
+if sys.version_info < python_requirements:
+    print("You must run Python {}.{} or above".format(python_requirements[0], python_requirements[1]))
+    sys.exit(1)
+
 VERSION_MAJOR = 0
 VERSION_MINOR = 2
-VERSION_BUILD = 3
+VERSION_BUILD = 4
 
 VERSION = f"{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_BUILD}"
 

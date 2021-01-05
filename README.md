@@ -3,7 +3,7 @@ This tool is used to generate bug reports in a fancy way, and to make sure not t
 
 ### HOW TO INSTALL
 1. clone the repo where you normally do
-2. create a venv or if you don't care about them, go directly to 3
+2. create a venv or if you don't care about them, go directly to 3. In either ways, make sure you are running <b>Python ≥ 3.6</b>
 3. install PySide2: `pip install PySide2`
 4. you should be good to go
 
