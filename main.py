@@ -4,7 +4,7 @@ import webbrowser
 from PySide2.QtCore import Qt
 from PySide2.QtGui import QMouseEvent
 from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QGroupBox, QLineEdit, QPlainTextEdit, \
-    QHBoxLayout, QComboBox, QPushButton, QFileDialog, QDialog, QMessageBox, QFormLayout, QMenu
+    QHBoxLayout, QComboBox, QPushButton, QFileDialog, QDialog, QMessageBox, QFormLayout, QMenu, QScrollArea
 
 python_requirements = (3, 6)
 if sys.version_info < python_requirements:
@@ -12,8 +12,8 @@ if sys.version_info < python_requirements:
     sys.exit(1)
 
 VERSION_MAJOR = 0
-VERSION_MINOR = 2
-VERSION_BUILD = 4
+VERSION_MINOR = 3
+VERSION_BUILD = 0
 
 VERSION = f"{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_BUILD}"
 
@@ -38,18 +38,28 @@ PRIORITY_ITEMS = [PRIORITY_NONE_STR] + IMPACT_ITEMS + [PRIORITY_URGENT_STR]
 class Window(QMainWindow):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
+        self.setGeometry(0, 0, 600, 800)
         self.setWindowTitle(f"Bug report - v. {VERSION}")
         self.dark_mode = False
         self.central_widget = QWidget()
-        self.layout = QVBoxLayout()
-        self.central_widget.setLayout(self.layout)
         self.setCentralWidget(self.central_widget)
+        self.central_layout = QVBoxLayout()
+        self.central_widget.setLayout(self.central_layout)
+        self.scroll_area = QScrollArea(widgetResizable=True)
+        self.central_layout.addWidget(self.scroll_area)
+        self.scroll_widget = QWidget()
+        self.scroll_area.setWidget(self.scroll_widget)
+
+        self.layout = QVBoxLayout()
+        self.scroll_widget.setLayout(self.layout)
+
+        env_ver_layout = QHBoxLayout()
         version_box = QGroupBox("Version")
         version_layout = QVBoxLayout()
         version_box.setLayout(version_layout)
         self.version = QLineEdit()
         version_layout.addWidget(self.version)
-        self.layout.addWidget(version_box)
+        env_ver_layout.addWidget(version_box)
 
         # TODO add tiptoolhelp on several elements
 
@@ -58,7 +68,9 @@ class Window(QMainWindow):
         env_box.setLayout(env_layout)
         self.environment = QLineEdit()
         env_layout.addWidget(self.environment)
-        self.layout.addWidget(env_box)
+        env_ver_layout.addWidget(env_box)
+
+        self.layout.addLayout(env_ver_layout)
 
         desc_box = QGroupBox("Description")
         desc_layout = QVBoxLayout()
@@ -136,7 +148,7 @@ class Window(QMainWindow):
         gen_email_button.clicked.connect(self.enter_address)
         generate_layout.addWidget(gen_email_button)
         generate_box.setLayout(generate_layout)
-        self.layout.addWidget(generate_box)
+        self.central_layout.addWidget(generate_box)
 
     def set_priority(self):
         """
