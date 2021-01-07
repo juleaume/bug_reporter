@@ -13,7 +13,7 @@ if sys.version_info < python_requirements:
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 3
-VERSION_BUILD = 0
+VERSION_BUILD = 1
 
 VERSION = f"{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_BUILD}"
 
