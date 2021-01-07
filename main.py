@@ -13,7 +13,7 @@ if sys.version_info < python_requirements:
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 3
-VERSION_BUILD = 2
+VERSION_BUILD = 3
 
 VERSION = f"{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_BUILD}"
 
@@ -60,8 +60,9 @@ class Window(QMainWindow):
         self.version = QLineEdit()
         version_layout.addWidget(self.version)
         env_ver_layout.addWidget(version_box)
-
-        # TODO add tiptoolhelp on several elements
+        version_box.setToolTip(
+            f"Name the current version where the bug occurred, e.g. V.{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_BUILD}"
+        )
 
         env_box = QGroupBox("Environment")
         env_layout = QVBoxLayout()
@@ -69,6 +70,7 @@ class Window(QMainWindow):
         self.environment = QLineEdit()
         env_layout.addWidget(self.environment)
         env_ver_layout.addWidget(env_box)
+        env_box.setToolTip("Specify the environment of work, e.g. OS, hardware version, current configuration...")
 
         self.layout.addLayout(env_ver_layout)
 
@@ -77,15 +79,21 @@ class Window(QMainWindow):
         desc_box.setLayout(desc_layout)
         self.description = QPlainTextEdit()
         desc_layout.addWidget(self.description)
+        desc_box.setToolTip("Describe your problem, what is going on?")
         self.layout.addWidget(desc_box)
 
         res_box = QGroupBox("Results")
         res_layout = QHBoxLayout()
         self.results = dict()
+        result_help = {
+            OBTAINED_STR: "What you got",
+            EXPECTED_STR: "What you were supposed to get"
+        }
         for res in RESULTS_LST:
             box = QGroupBox(res)
             lay = QVBoxLayout()
             box.setLayout(lay)
+            box.setToolTip(result_help[res])
             self.results[res] = QPlainTextEdit()
             lay.addWidget(self.results[res])
             res_layout.addWidget(box)
@@ -97,6 +105,7 @@ class Window(QMainWindow):
         self.protocol = QPlainTextEdit("1.")
         proto_layout.addWidget(self.protocol)
         proto_box.setLayout(proto_layout)
+        proto_box.setToolTip("Describe the steps to reproduce the bug")
         self.layout.addWidget(proto_box)
 
         stack_box = QGroupBox("Stacktrace (if any)")
@@ -104,15 +113,22 @@ class Window(QMainWindow):
         self.stacktrace = QPlainTextEdit()
         stack_layout.addWidget(self.stacktrace)
         stack_box.setLayout(stack_layout)
+        stack_box.setToolTip("If you have a Stacktrace, it is welcomed here")
         self.layout.addWidget(stack_box)
 
         impact_box = QGroupBox("Impact")
         impact_layout = QHBoxLayout()
         self.impact = dict()
+        prio_help = {
+            SEVERITY_STR: "How severe this bug is (low: a little bit annoying, high: everything is broken)",
+            REPRODUCIBILITY_STR: "How often this bug occurs "
+                                 "(low: almost never or in a very specific condition, high: always)"
+        }
         for imp in IMPACT_LST:
             box = QGroupBox(imp)
             lay = QVBoxLayout()
             box.setLayout(lay)
+            box.setToolTip(prio_help[imp])
             self.impact[imp] = QComboBox()
             self.impact[imp].addItems(IMPACT_ITEMS)
             self.impact[imp].currentTextChanged.connect(lambda: self.set_priority())
@@ -127,6 +143,7 @@ class Window(QMainWindow):
         self.priority.addItems(PRIORITY_ITEMS)
         prio_layout.addWidget(self.priority)
         prio_box.setLayout(prio_layout)
+        prio_box.setToolTip("Is set automatically but can be overridden if needed")
         self.layout.addWidget(prio_box)
 
         file_box = QGroupBox("Attachments")
@@ -137,6 +154,7 @@ class Window(QMainWindow):
         file_button.clicked.connect(lambda: self.browse_file())
         file_layout.addWidget(file_button)
         file_box.setLayout(file_layout)
+        file_box.setToolTip("If you need to add a file")
         self.layout.addWidget(file_box)
 
         generate_box = QGroupBox("Generate")
