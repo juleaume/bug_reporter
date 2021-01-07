@@ -2,7 +2,7 @@ import sys
 import webbrowser
 
 from PySide2.QtCore import Qt
-from PySide2.QtGui import QMouseEvent
+from PySide2.QtGui import QMouseEvent, QCloseEvent
 from PySide2.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QGroupBox, QLineEdit, QPlainTextEdit, \
     QHBoxLayout, QComboBox, QPushButton, QFileDialog, QDialog, QMessageBox, QFormLayout, QMenu, QScrollArea
 
@@ -13,7 +13,7 @@ if sys.version_info < python_requirements:
 
 VERSION_MAJOR = 0
 VERSION_MINOR = 3
-VERSION_BUILD = 1
+VERSION_BUILD = 2
 
 VERSION = f"{VERSION_MAJOR}.{VERSION_MINOR}.{VERSION_BUILD}"
 
@@ -314,10 +314,29 @@ class Window(QMainWindow):
         else:
             self.setStyleSheet("")
 
+    def exit_confirmation(self):
+        """
+        Create and shows a dialog box asking the user if they are sure they want to quit
+        :return: None
+        """
+        confirmation_box = QMessageBox(self)
+        confirmation_box.setWindowTitle("Quit?")
+        confirmation_box.setText("Are you sure you want to quit?")
+        confirmation_box.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+        confirmation_box.setIcon(QMessageBox.Question)
+        confirmation_box.setDefaultButton(QMessageBox.No)
+        return confirmation_box.exec_() == QMessageBox.Yes
+
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
         if event.button() == Qt.RightButton:
             self._create_menu(event)
             event.accept()
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        if self.exit_confirmation():
+            event.accept()
+        else:
+            event.ignore()
 
 
 if __name__ == '__main__':
