@@ -36,11 +36,13 @@ PRIORITY_ITEMS = [PRIORITY_NONE_STR] + IMPACT_ITEMS + [PRIORITY_URGENT_STR]
 
 
 class Window(QMainWindow):
+    dark_mode = False
+    high_contrast = False
+
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
         self.setGeometry(0, 0, 600, 800)
         self.setWindowTitle(f"Bug report - v. {VERSION}")
-        self.dark_mode = False
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.central_layout = QVBoxLayout()
@@ -320,6 +322,7 @@ class Window(QMainWindow):
     def _create_menu(self, event: QMouseEvent):
         context_menu = QMenu(self)
         context_menu.addAction("Toggle dark mode", self.set_dark_mode)
+        context_menu.addAction("Toggle high contrast", self.set_high_contrast)
         context_menu.addAction("Generate report", self.save_report)
         context_menu.addAction("Send email to...", self.enter_address)
         context_menu.addAction("Quit Report", self.close)
@@ -327,8 +330,17 @@ class Window(QMainWindow):
 
     def set_dark_mode(self):
         self.dark_mode = not self.dark_mode
+        self.high_contrast = False
         if self.dark_mode:
             self.setStyleSheet("background-color: #002b36; color: #b58900")
+        else:
+            self.setStyleSheet("")
+
+    def set_high_contrast(self):
+        self.high_contrast = not self.high_contrast
+        self.dark_mode = False
+        if self.high_contrast:
+            self.setStyleSheet("background-color: black; color: white")
         else:
             self.setStyleSheet("")
 
