@@ -325,6 +325,8 @@ class Window(QMainWindow):
         context_menu.addAction("Toggle high contrast", self.set_high_contrast)
         context_menu.addAction("Generate report", self.save_report)
         context_menu.addAction("Send email to...", self.enter_address)
+        if sys.platform == "win32":
+            context_menu.addAction("Create shortcut", self.create_shortcut)
         context_menu.addAction("Quit Report", self.close)
         context_menu.exec_(self.mapToGlobal(event.pos()))
 
@@ -343,6 +345,18 @@ class Window(QMainWindow):
             self.setStyleSheet("background-color: black; color: white")
         else:
             self.setStyleSheet("")
+
+    def create_shortcut(self):
+        confirmation_box = QMessageBox(self)
+        confirmation_box.setWindowTitle("Confirmation?")
+        confirmation_box.setText("Are you sure you want to create a shortcut?")
+        confirmation_box.setStandardButtons(QMessageBox.No | QMessageBox.Yes)
+        confirmation_box.setIcon(QMessageBox.Question)
+        confirmation_box.setDefaultButton(QMessageBox.No)
+        if confirmation_box.exec_() == QMessageBox.Yes:
+            with open("report.bat", 'w') as bat_file:
+                bat_file.write(f"{sys.executable} {sys.argv[0]}")
+            # TODO créer un lien du bureau vers le bat
 
     def exit_confirmation(self):
         """
